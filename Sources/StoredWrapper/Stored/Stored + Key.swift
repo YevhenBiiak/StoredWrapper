@@ -13,8 +13,8 @@ extension Stored {
     
     public class AnyKey {
         public typealias Key = Stored.Key<Value>
-        let name: String
-        init(name: String) {
+        public let name: String
+        public init(name: String) {
             self.name = name
         }
     }

@@ -74,12 +74,7 @@ final class UserDefaultsKeyObservation: NSObject {
         object = nil
     }
     
-    override func observeValue(
-        forKeyPath keyPath: String?,
-        of object: Any?,
-        change: [NSKeyValueChangeKey: Any]?,
-        context: UnsafeMutableRawPointer?
-    ) {
+    override func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey: Any]?, context: UnsafeMutableRawPointer?) {
         guard let selfObject = self.object else {
             invalidate()
             return
