@@ -1,10 +1,21 @@
 import XCTest
 @testable import StoredWrapper
 
-extension StoredKey {
-    static let stringKey = StoredKey(rawValue: "stringKey")
-    static let enumKey = StoredKey(rawValue: "enumKey")
+
+extension Stored<String>.Keys {
+    static let stringKey = Key(name: "stringKey")
 }
+extension Stored<String?>.Keys {
+    static let stringKey = Key(name: "stringKey")
+}
+extension Stored<Num>.Keys {
+    static let enumKey = Key(name: "enumKey")
+}
+extension Stored<Num?>.Keys {
+    static let enumKey = Key(name: "enumKey")
+}
+
+enum Num: Codable { case one, two, three }
 
 final class StoredTests: XCTestCase {
     
@@ -12,18 +23,17 @@ final class StoredTests: XCTestCase {
     var sut2: SUT2!
     
     override func setUpWithError() throws {
-        Stored.removeAll()
+        Stored.removeAll(store: .standard)
     }
     
     override func tearDownWithError() throws {
-        Stored.removeAll()
+        Stored.removeAll(store: .standard)
         sut1 = nil
         sut2 = nil
     }
     
     // MARK: - Test Double
     
-    enum Num: String { case one, two, three }
     
     struct SUT1 {
         
@@ -227,8 +237,8 @@ final class StoredTests: XCTestCase {
         let existingNum = Num.three
         
         // When
-        UserDefaults.standard.set(existingString, forKey: "stringKey")
-        UserDefaults.standard.set(existingNum.rawValue, forKey: "enumKey")
+        Stored("stringKey").set(value: existingString)
+        Stored("enumKey").set(value: existingNum)
         
         // Then
         sut1 = SUT1()
@@ -245,8 +255,8 @@ final class StoredTests: XCTestCase {
         
         XCTAssert(Stored(.stringKey).isExists == true)
         XCTAssert(Stored(.enumKey).isExists == true)
-        XCTAssert(Stored("stringKey").isExists == true)
-        XCTAssert(Stored("enumKey").isExists == true)
+        XCTAssert(Stored<String>("stringKey").isExists == true)
+        XCTAssert(Stored<String>("enumKey").isExists == true)
         
         // When
         Stored(.stringKey).remove()
@@ -255,8 +265,8 @@ final class StoredTests: XCTestCase {
         // Then
         XCTAssert(Stored(.stringKey).isExists == false)
         XCTAssert(Stored(.enumKey).isExists == false)
-        XCTAssert(Stored("stringKey").isExists == false)
-        XCTAssert(Stored("enumKey").isExists == false)
+        XCTAssert(Stored<String>("stringKey").isExists == false)
+        XCTAssert(Stored<Num>("enumKey").isExists == false)
         
         XCTAssert(sut1.stringOptional == nil)
         XCTAssert(sut1.enumOptional == nil)
@@ -271,17 +281,17 @@ final class StoredTests: XCTestCase {
         
         XCTAssert(Stored(.stringKey).isExists == true)
         XCTAssert(Stored(.enumKey).isExists == true)
-        XCTAssert(Stored("stringKey").isExists == true)
-        XCTAssert(Stored("enumKey").isExists == true)
+        XCTAssert(Stored<String>("stringKey").isExists == true)
+        XCTAssert(Stored<Num>("enumKey").isExists == true)
         
-        Stored("stringKey").remove()
-        Stored("enumKey").remove()
+        Stored<String>("stringKey").remove()
+        Stored<Num>("enumKey").remove()
         
         // Then
         XCTAssert(Stored(.stringKey).isExists == false)
         XCTAssert(Stored(.enumKey).isExists == false)
-        XCTAssert(Stored("stringKey").isExists == false)
-        XCTAssert(Stored("enumKey").isExists == false)
+        XCTAssert(Stored<String>("stringKey").isExists == false)
+        XCTAssert(Stored<Num>("enumKey").isExists == false)
         
         XCTAssert(sut1.stringOptional == nil)
         XCTAssert(sut1.enumOptional == nil)
@@ -300,8 +310,8 @@ final class StoredTests: XCTestCase {
         _testSUTsIsEquals()
         
         // When
-        UserDefaults.standard.set(newString, forKey: "stringKey")
-        UserDefaults.standard.set(newNum.rawValue, forKey: "enumKey")
+        Stored("stringKey").set(value: newString)
+        Stored("enumKey").set(value: newNum)
         
         _testSUTsPropertiesIsChanged(string: newString, num: newNum)
     }
